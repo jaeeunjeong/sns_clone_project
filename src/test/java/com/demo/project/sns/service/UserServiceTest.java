@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 
@@ -24,6 +25,9 @@ public class UserServiceTest {
 
     @Autowired
     private UserEntityRepository userEntityRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder encoder;
 
     @DisplayName("회원가입이 정상적으로 작동하는 경우")
     @Test
@@ -48,7 +52,8 @@ public class UserServiceTest {
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(mock(UserEntity.class)));
         when(userEntityRepository.save(any())).thenReturn(Optional.of(mock(UserEntity.class)));
 
-        Assertions.assertThrows(SnsApplicationException.class, () -> userService.join(userName, password));
+        SnsAppExcep e = Assertions.assertThrows(SnsApplicationException.class, () -> userService.join(userName, password));
+        Assertions.assertEquals(e.g , );
     }
 
 
