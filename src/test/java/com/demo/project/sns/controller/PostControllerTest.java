@@ -1,5 +1,8 @@
 package com.demo.project.sns.controller;
 
+import com.demo.project.sns.controller.request.PostCreateRequest;
+import com.demo.project.sns.exception.SnsApplicationException;
+import com.demo.project.sns.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.h2.api.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +30,9 @@ public class PostControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    UserService userService;
+
     @DisplayName("포스트작성")
     @Test
     @WithMockUser
@@ -48,9 +54,11 @@ public class PostControllerTest {
 
         String userName = "username";
         String password = "password";
+        String title = "title";
+        String body = "body";
 
         // when
-        when(userService.login(userName, password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, "DUP"));
+        when(userService.login(userName, password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATE_COLUMN_NAME_1));
 
         mockMvc.perform(post("/api/v1/post")
                 .contentType(MediaType.APPLICATION_JSON)
