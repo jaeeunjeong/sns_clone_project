@@ -2,8 +2,13 @@ package com.demo.project.sns.model;
 
 import com.demo.project.sns.model.entity.UserEntity;
 import lombok.Getter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * dto와 entity의 분리의 이유
@@ -12,7 +17,7 @@ import java.sql.Timestamp;
  * entity는 db랑 밀접해서 클래스의 변화에 민감함
  */
 @Getter
-public class User {
+public class User implements UserDetails {
     private Long id;
     private String userName;
     private String password;
@@ -23,5 +28,35 @@ public class User {
 
     public static User fromEntity(UserEntity entity) {
         return new User();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(this.getUserRole().toString()));
+    }
+
+    @Override
+    public String getUsername() {
+        return this.userName;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return this.deletedAt == null;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return this.deletedAt == null;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 }

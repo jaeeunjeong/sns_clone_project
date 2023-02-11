@@ -8,13 +8,14 @@ import com.demo.project.sns.repository.UserEntityRepository;
 import com.demo.project.sns.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService{ //  extends UserDetailsService user이름으로 user정보를 찾는 것.
 
     private final UserEntityRepository userEntityRepository;
     private final BCryptPasswordEncoder encoder;
@@ -50,5 +51,10 @@ public class UserService {
         JwtTokenUtils.generateToken(userName, secretKey, expiredTimeMs);
 
         return "";
+    }
+
+    public User loadUserByUserName(String userName){
+        return userEntityRepository.findByUserName(userName).map(User::fromEntity).orElseThrow(()->
+                new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", userName)));
     }
 }

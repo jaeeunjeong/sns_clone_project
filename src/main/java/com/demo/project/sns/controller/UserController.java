@@ -28,11 +28,11 @@ public class UserController {
     public Response<UserJoinResponse> join(@RequestBody UserJoinRequest request) {
         User user = userService.join(request.getUserName(), request.getPassword());
         UserJoinResponse response = UserJoinResponse.fromUser(user);
-        return Response.success(response);
+        return Response.success();
     }
 
     @PostMapping("/login")
-    public Response<UserLoginResponse> login(@RequestBody UserLoginRequest request){
+    public Response<UserLoginResponse> login(@RequestBody UserLoginRequest request) {
         String token = userService.login(request.getUserName(), request.getPassword());
         return Response.success(new UserLoginResponse(token));
     }

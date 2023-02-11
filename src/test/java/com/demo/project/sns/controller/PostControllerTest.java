@@ -2,6 +2,7 @@ package com.demo.project.sns.controller;
 
 import com.demo.project.sns.controller.request.PostCreateRequest;
 import com.demo.project.sns.exception.SnsApplicationException;
+import com.demo.project.sns.service.PostService;
 import com.demo.project.sns.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.h2.api.ErrorCode;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -25,13 +27,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PostControllerTest {
 
     @Autowired
+    UserService userService;
+    @MockBean
+    PostService postService;
+    @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    UserService userService;
 
     @DisplayName("포스트작성")
     @Test

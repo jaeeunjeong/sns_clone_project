@@ -17,11 +17,15 @@ public class PostService {
     private final UserEntityRepository userEntityRepository;
 
     @Transactional
-    public void create(String title, String body, String userName){
+    public void create(String title, String body, String userName) {
+        // user find
         userEntityRepository.findByUserName(userName)
-                .orElseThrow(()->new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", userName)));
+                .orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", userName)));
 
-        postEntityRepository.save(new PostEntity());
+        // post save
+        PostEntity saved = postEntityRepository.save(new PostEntity());
+
+        //
     }
 
 }

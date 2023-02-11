@@ -14,7 +14,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Table
-@SQLDelete(sql = "UPDATE user SET deleted_at = now() where id = ?")
+@SQLDelete(sql = "UPDATE user SET deleted_at = now() where id = ?") // delete 시 이렇게 사용되도록함.
 @Where(clause = "deleted_at is NULL")
 public class PostEntity {
 
@@ -30,7 +30,7 @@ public class PostEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity role;
+    private UserEntity user;
 
     @Column
     private Timestamp registeredAt;
@@ -50,5 +50,15 @@ public class PostEntity {
     @PreUpdate
     void updatedAt() {
         this.updatedAt = Timestamp.from(Instant.now());
+    }
+
+    public static PostEntity of(String title, String body, UserEntity user){
+        PostEntity entity = new PostEntity();
+
+        entity.title = title;
+        entity.body = body;
+        entity.user = user;
+
+        return entity;
     }
 }
