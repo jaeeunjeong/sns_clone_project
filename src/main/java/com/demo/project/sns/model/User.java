@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * dto와 entity의 분리의 이유
@@ -32,7 +34,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(this.getUserRole().toString()));
+        return Stream.of(new SimpleGrantedAuthority(this.getUserRole().toString())).collect(Collectors.toList());
     }
 
     @Override
