@@ -1,5 +1,6 @@
 package com.demo.project.sns.service;
 
+import com.demo.project.sns.exception.ErrorCode;
 import com.demo.project.sns.exception.SnsApplicationException;
 import com.demo.project.sns.fixture.UserEntityFixture;
 import com.demo.project.sns.model.entity.UserEntity;
@@ -52,8 +53,10 @@ public class UserServiceTest {
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(mock(UserEntity.class)));
         when(userEntityRepository.save(any())).thenReturn(Optional.of(mock(UserEntity.class)));
 
-        SnsAppExcep e = Assertions.assertThrows(SnsApplicationException.class, () -> userService.join(userName, password));
-        Assertions.assertEquals(e.g , );
+        SnsApplicationException e = Assertions.assertThrows(
+                        SnsApplicationException.class,
+                        () -> userService.join(userName, password));
+        Assertions.assertEquals(e.getMessage(), ErrorCode.INVALID_PERMISSION);
     }
 
 
@@ -64,7 +67,7 @@ public class UserServiceTest {
         String userName = "userName";
         String password = "password";
 
-        UserEntity fixture = UserEntityFixture.get(userName, password);
+        UserEntity fixture = UserEntityFixture.get(userName, password, 1L);
 
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(fixture));
 
@@ -78,7 +81,7 @@ public class UserServiceTest {
         String userName = "userName";
         String password = "password";
 
-        UserEntity fixture = UserEntityFixture.get(userName, password);
+        UserEntity fixture = UserEntityFixture.get(userName, password, 1L);
 
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.empty());
 
@@ -93,7 +96,7 @@ public class UserServiceTest {
         String password = "password";
         String password2 = "password2";
 
-        UserEntity fixture = UserEntityFixture.get(userName, password);
+        UserEntity fixture = UserEntityFixture.get(userName, password, 1L);
 
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.empty());
 
