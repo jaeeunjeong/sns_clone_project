@@ -5,9 +5,9 @@ import com.demo.project.sns.model.entity.UserEntity;
 
 public class PostEntityFixture {
 
-    public static PostEntity get(String userName, Long postId) {
+    public static PostEntity get(String userName, Long postId, Long userId) {
         UserEntity userEntity = new UserEntity();
-        userEntity.setId(1L);
+        userEntity.setId(userId);
         userEntity.setUserName(userName);
 
         PostEntity result = new PostEntity();

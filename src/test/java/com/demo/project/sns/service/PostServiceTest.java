@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -71,9 +73,10 @@ public class PostServiceTest {
         String body = "body";
         String userName = "userName";
         Long postId = 1L;
+        Long userId = 1L;
 
         // PostEntity mockPostEntity = mock(PostEntity.class);
-        PostEntity postEntity = PostEntityFixture.get(userName, postId);
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, userId);
         UserEntity userEntity = postEntity.getUser();
 
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
@@ -91,8 +94,9 @@ public class PostServiceTest {
         String body = "body";
         String userName = "userName";
         Long postId = 1L;
+        Long userId = 1L;
 
-        PostEntity postEntity = PostEntityFixture.get(userName, postId);
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, userId);
         UserEntity userEntity = postEntity.getUser();
 
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
@@ -110,8 +114,9 @@ public class PostServiceTest {
         String body = "body";
         String userName = "userName";
         Long postId = 1L;
+        Long userId = 1L;
 
-        PostEntity postEntity = PostEntityFixture.get(userName, postId);
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, userId);
         UserEntity writer = UserEntityFixture.get("other", "password", 1L);
 
         when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(writer));
@@ -120,5 +125,83 @@ public class PostServiceTest {
         SnsApplicationException e = Assertions.assertThrows(
                 SnsApplicationException.class, () -> postService.modify(title, body, userName, postId));
         Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
+    }
+
+    @DisplayName("포스트 삭제이 성공한 경우")
+    @Test
+    void test7() {
+
+        String userName = "userName";
+        Long postId = 1L;
+        Long userId = 1L;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, userId);
+        UserEntity userEntity = postEntity.getUser();
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        Assertions.assertDoesNotThrow(() -> postService.delete(postId, userName));
+
+    }
+
+    @DisplayName("포스트 삭제시 요청한 포스트가 존재하지 않는 경우")
+    @Test
+    void test8() {
+
+        String userName = "userName";
+        Long postId = 1L;
+        Long userId = 1L;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, userId);
+        UserEntity userEntity = postEntity.getUser();
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.empty());
+
+        SnsApplicationException e = Assertions.assertThrows(
+                SnsApplicationException.class, () -> postService.delete(postId, userName));
+        Assertions.assertEquals(ErrorCode.POST_NOT_FOUND, e.getErrorCode());
+    }
+
+    @DisplayName("포스트 삭제시 권한이 없는 경우")
+    @Test
+    void test9() {
+        String userName = "userName";
+        Long postId = 1L;
+        Long userId = 1L;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId, userId);
+        UserEntity writer = UserEntityFixture.get("other", "password", 1L);
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(writer));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        SnsApplicationException e = Assertions.assertThrows(
+                SnsApplicationException.class, () -> postService.delete(postId, userName));
+        Assertions.assertEquals(ErrorCode.INVALID_PERMISSION, e.getErrorCode());
+    }
+
+    @DisplayName("피드 목록 요청이 성공한 경우")
+    @Test
+    void test10() {
+        Pageable pageable = mock(Pageable.class);
+
+        when(postEntityRepository.findAll(pageable)).thenReturn(Page.empty());
+
+        Assertions.assertDoesNotThrow(() -> postService.list(pageable));
+
+    }
+
+    @DisplayName("내 피드 목록 요청이 성공한 경우")
+    @Test
+    void test11() {
+        Pageable pageable = mock(Pageable.class);
+        UserEntity userEntity = mock(UserEntity.class);
+
+        when(userEntityRepository.findByUserName(any())).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findAllByUser(any(), pageable)).thenReturn(Page.empty());
+
+        Assertions.assertDoesNotThrow(() -> postService.my("", pageable));
     }
 }
