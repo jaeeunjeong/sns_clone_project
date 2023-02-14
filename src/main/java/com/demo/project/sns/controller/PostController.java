@@ -45,8 +45,19 @@ public class PostController {
         return Response.success(postService.list(pageable).map(PostResponse::fromPost));
     }
     @GetMapping("/my")
-    public Response<Page<PostResponse>> list(Pageable pageable, Authentication authentication){
+    public Response<Page<PostResponse>> my(Pageable pageable, Authentication authentication){
         // 페이징을 통해 성능 저하를 방지해야함. Pageable 이용
         return Response.success(postService.my(authentication.getName(), pageable).map(PostResponse::fromPost));
+    }
+
+    @PostMapping("/{postId}/likes")
+    public Response<Void> like(@PathVariable Long postId, Authentication authentication){
+        postService.like(postId, authentication.getName());
+        return Response.success();
+    }
+
+    @GetMapping("/{postId}/likes")
+    public Response<Integer> likeCount(@PathVariable Long postId){
+        return Response.success(postService.likeCount(postId));
     }
 }
