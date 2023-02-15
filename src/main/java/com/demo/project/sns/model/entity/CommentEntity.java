@@ -1,6 +1,5 @@
 package com.demo.project.sns.model.entity;
 
-import com.demo.project.sns.model.UserRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -13,24 +12,27 @@ import java.time.Instant;
 @Entity
 @Getter
 @Setter
-@Table
-@SQLDelete(sql = "UPDATE user SET deleted_at = now() where id = ?")
+@Table(name = "like", indexes = {
+    @Index(name = "post_id_idx", columnList = "post_id")
+})
+@SQLDelete(sql = "UPDATE like SET deleted_at = now() where id = ?") // delete 시 이렇게 사용되도록함.
 @Where(clause = "deleted_at is NULL")
-public class PostEntity {
+public class CommentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "title")
-    private String title;
-
-    @Column(name = "body", columnDefinition = "TEXT")
-    private String body;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private PostEntity post;
+
+    @Column
+    private String comment;
 
     @Column
     private Timestamp registeredAt;
@@ -38,7 +40,6 @@ public class PostEntity {
     @Column
     private Timestamp updatedAt;
 
-    // 로그와 같은 관리나 삭제의 flag로서 사용하기 위함
     @Column
     private Timestamp deletedAt;
 
@@ -52,12 +53,12 @@ public class PostEntity {
         this.updatedAt = Timestamp.from(Instant.now());
     }
 
-    public static PostEntity of(String title, String body, UserEntity user){
-        PostEntity entity = new PostEntity();
+    public static CommentEntity of(UserEntity user, PostEntity post, String comment){
+        CommentEntity entity = new CommentEntity();
 
-        entity.title = title;
-        entity.body = body;
         entity.user = user;
+        entity.post = post;
+        entity.comment = comment;
 
         return entity;
     }

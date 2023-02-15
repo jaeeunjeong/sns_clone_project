@@ -1,5 +1,6 @@
 package com.demo.project.sns.controller;
 
+import com.demo.project.sns.controller.request.PostCommentRequest;
 import com.demo.project.sns.controller.request.PostCreateRequest;
 import com.demo.project.sns.controller.request.PostModifyRequest;
 import com.demo.project.sns.exception.ErrorCode;
@@ -267,6 +268,42 @@ public class PostControllerTest {
         doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).like(any(), any());
         mockMvc.perform(get("/api/v1/posts/1/likes")
                 .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+    @DisplayName("댓글 기능 확인")
+    @Test
+    @WithMockUser
+    public void test17() throws Exception {
+        mockMvc.perform(get("/api/v1/posts/1/comments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment")))
+        ).andDo(print())
+                .andExpect(status().isOk())
+        ;
+    }
+
+    @DisplayName("댓글 작성시 로그인하지 않은 경우")
+    @Test
+    @WithAnonymousUser
+    public void test18() throws Exception {
+        mockMvc.perform(get("/api/v1/posts/1/comments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment")))
+        ).andDo(print())
+                .andExpect(status().isUnauthorized())
+        ;
+    }
+
+    @DisplayName("댓글 작성시 게시물이 없는 경우")
+    @Test
+    @WithAnonymousUser
+    public void test19() throws Exception {
+        doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).comment(any(), any(), any());
+        mockMvc.perform(get("/api/v1/posts/1/comments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment")))
         ).andDo(print())
                 .andExpect(status().isNotFound())
         ;
