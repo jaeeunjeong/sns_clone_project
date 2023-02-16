@@ -3,16 +3,12 @@ package com.demo.project.sns.service;
 import com.demo.project.sns.controller.request.PostCommentRequest;
 import com.demo.project.sns.exception.ErrorCode;
 import com.demo.project.sns.exception.SnsApplicationException;
+import com.demo.project.sns.model.AlarmArgs;
+import com.demo.project.sns.model.AlarmType;
 import com.demo.project.sns.model.Comment;
 import com.demo.project.sns.model.Post;
-import com.demo.project.sns.model.entity.CommentEntity;
-import com.demo.project.sns.model.entity.LikeEntity;
-import com.demo.project.sns.model.entity.PostEntity;
-import com.demo.project.sns.model.entity.UserEntity;
-import com.demo.project.sns.repository.CommentEntityRepository;
-import com.demo.project.sns.repository.LikeEntityRepository;
-import com.demo.project.sns.repository.PostEntityRepository;
-import com.demo.project.sns.repository.UserEntityRepository;
+import com.demo.project.sns.model.entity.*;
+import com.demo.project.sns.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +23,7 @@ public class PostService {
     private final UserEntityRepository userEntityRepository;
     private final LikeEntityRepository likeEntityRepository;
     private final CommentEntityRepository commentEntityRepository;
+    private final AlarmEntityRepository alarmEntityRepository;
 
     @Transactional
     public void create(String title, String body, String userName) {
@@ -113,6 +110,8 @@ public class PostService {
         // likeEntityRepository
         likeEntityRepository.save(LikeEntity.of(userEntity, postEntity));
 
+        alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId()))));
+
     }
 
     public Integer likeCount(Long postId) {
@@ -126,8 +125,8 @@ public class PostService {
         PostEntity postEntity = getPost(postId);
         UserEntity userEntity = getUser(userName);
 
-
         commentEntityRepository.save(CommentEntity.of(userEntity, postEntity, userName);
+        alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NOW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postEntity.getId()))));
     }
 
     public Page<CommentEntity> getComments(Long postId, Pageable pageable){
@@ -145,4 +144,5 @@ public class PostService {
                 new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", userName)));
         return userEntity;
     }
+\
 }
