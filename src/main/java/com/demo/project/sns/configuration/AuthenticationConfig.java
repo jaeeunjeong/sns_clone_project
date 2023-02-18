@@ -6,7 +6,9 @@ import com.demo.project.sns.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,6 +23,12 @@ public class AuthenticationConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${jwt.secret-key}")
     private String key;
+
+    // 불필요한 요청을 처리하지 않도록함.
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().regexMatchers("^(?!/api/).*");
+    }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
