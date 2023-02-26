@@ -12,14 +12,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService{ //  extends UserDetailsService user이름으로 user정보를 찾는 것.
+public class UserService { //  extends UserDetailsService user이름으로 user정보를 찾는 것.
 
     private final UserEntityRepository userEntityRepository;
     private final AlarmEntityRepository alarmEntityRepository;
@@ -58,12 +57,13 @@ public class UserService{ //  extends UserDetailsService user이름으로 user�
         return "";
     }
 
-    public User loadUserByUserName(String userName){
-        return userEntityRepository.findByUserName(userName).map(User::fromEntity).orElseThrow(()->
+    public User loadUserByUserName(String userName) {
+        return userEntityRepository.findByUserName(userName).map(User::fromEntity).orElseThrow(() ->
                 new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", userName)));
     }
 
-    public Page<Alrm> alarmList(String userName, Pageable pageable) {
+    @Transactional
+    public Page<Alarm> alarmList(String userName, Pageable pageable) {
 
         UserEntity userEntity = userEntityRepository.findByUserName(userName).orElseThrow(() ->
                 new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded", userName)));
